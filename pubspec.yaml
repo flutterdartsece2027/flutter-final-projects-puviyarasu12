@@ -1,0 +1,53 @@
+name: animeinfo
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Icons
+  cupertino_icons: ^1.0.6
+  intl: ^0.18.1
+  shimmer: ^3.0.0
+  url_launcher: ^6.3.1
+
+  # Firebase
+  firebase_core: ^2.25.3
+  firebase_auth: ^4.17.8
+  cloud_firestore: ^4.17.3
+
+  # Utilities
+  shared_preferences: ^2.2.0
+  image_picker: ^1.1.2
+  http: ^1.2.2
+  connectivity_plus: ^6.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.9
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo2.png"
+
+flutter_native_splash:
+  color: "#000000"
+  image: assets/images/sukuna-anime-jujutsu-kaisen-character-hd-png-7040816946829519eyzofqncs-removebg-preview.png
+  android: true
+  ios: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/1331108.jpeg
+    - assets/images/wp12383811-attack-on-titan-8k-wallpapers.jpg
+    - assets/images/sukuna-anime-jujutsu-kaisen-character-hd-png-7040816946829519eyzofqncs-removebg-preview.png
