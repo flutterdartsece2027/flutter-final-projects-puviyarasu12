@@ -15,7 +15,22 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   File? _profileImage;
+  String _username = "Otaku Name";
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final name = prefs.getString('username') ?? "Otaku Name";
+    setState(() {
+      _username = name;
+    });
+  }
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -41,7 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
             GestureDetector(
               onTap: _pickImage,
               child: CircleAvatar(
-                radius: 50,
+                radius: 55,
                 backgroundColor: Colors.white24,
                 backgroundImage: _profileImage != null ? FileImage(_profileImage!) : null,
                 child: _profileImage == null
@@ -50,20 +65,21 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text("Otaku Name", style: TextStyle(color: Colors.white, fontSize: 22)),
+            Text(_username, style: const TextStyle(color: Colors.white, fontSize: 22)),
             const SizedBox(height: 30),
+            const Divider(color: Colors.white24),
             ListTile(
               leading: const Icon(Icons.favorite, color: Colors.deepPurpleAccent),
               title: const Text("My Watchlist", style: TextStyle(color: Colors.white)),
               onTap: () {
-                       Navigator.push(context, MaterialPageRoute(builder: (_)=> const WatchlistPage()),);
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const WatchlistPage()));
               },
             ),
             ListTile(
               leading: const Icon(Icons.settings, color: Colors.deepPurpleAccent),
               title: const Text("Settings", style: TextStyle(color: Colors.white)),
               onTap: () {
-                // You can add settings navigation here later if needed
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
               },
             ),
             ListTile(
@@ -83,6 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
+
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
@@ -92,6 +109,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool notificationsEnabled = false;
+  String _username = "";
 
   @override
   void initState() {
@@ -103,6 +121,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       notificationsEnabled = prefs.getBool('notifications') ?? false;
+      _username = prefs.getString('username') ?? "Otaku Name";
     });
   }
 
@@ -112,6 +131,36 @@ class _SettingsPageState extends State<SettingsPage> {
     setState(() {
       notificationsEnabled = value;
     });
+  }
+
+  Future<void> _changeUsername() async {
+    final controller = TextEditingController(text: _username);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Change Username"),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: "Enter new username"),
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Cancel"),
+            onPressed: () => Navigator.pop(context),
+          ),
+          ElevatedButton(
+            child: const Text("Save"),
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('username', controller.text.trim());
+              setState(() => _username = controller.text.trim());
+              Navigator.pop(context);
+              _showMessage("Username updated");
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _clearWatchlist() async {
@@ -130,9 +179,22 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _clearAllData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    _showMessage("All preferences cleared");
+    final confirm = await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Confirm"),
+        content: const Text("Are you sure you want to clear all app data?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Yes")),
+        ],
+      ),
+    );
+    if (confirm) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      _showMessage("All preferences cleared");
+    }
   }
 
   void _showMessage(String msg) {
@@ -153,13 +215,21 @@ class _SettingsPageState extends State<SettingsPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const Text("Preferences", style: TextStyle(color: Colors.white70, fontSize: 18)),
           SwitchListTile(
             value: notificationsEnabled,
             onChanged: _toggleNotifications,
             title: const Text("Enable Notifications", style: TextStyle(color: Colors.white)),
             activeColor: Colors.deepPurpleAccent,
           ),
+          ListTile(
+            leading: const Icon(Icons.edit, color: Colors.cyan),
+            title: const Text("Change Username", style: TextStyle(color: Colors.white)),
+            subtitle: Text(_username, style: const TextStyle(color: Colors.white60)),
+            onTap: _changeUsername,
+          ),
           const Divider(color: Colors.white24),
+          const Text("Data Management", style: TextStyle(color: Colors.white70, fontSize: 18)),
           ListTile(
             leading: const Icon(Icons.delete_forever, color: Colors.redAccent),
             title: const Text("Clear Watchlist", style: TextStyle(color: Colors.white)),
