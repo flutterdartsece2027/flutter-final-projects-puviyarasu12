@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import '../models/anime.dart';
 import '../api_service.dart';
+import 'animedetails.dart';
 import 'profile_page.dart';
 import 'drawer.dart';
 import 'animewatchlist.dart';
@@ -55,17 +58,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void searchAnime(String query) async {
-    if (query.isEmpty) {
-      setState(() => searchResults = []);
-      return;
-    }
-    try {
-      final results = await ApiService.searchAnime(query);
-      setState(() => searchResults = results);
-    } catch (e) {
-      print('Search error: $e');
-    }
+  Timer? _debounce;
+  void searchAnime(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      if (query.isEmpty) {
+        setState(() => searchResults = []);
+      } else {
+        final results = await ApiService.searchAnime(query);
+        setState(() => searchResults = results);
+      }
+    });
   }
 
   @override

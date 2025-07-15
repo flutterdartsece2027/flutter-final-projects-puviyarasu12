@@ -169,6 +169,7 @@ class NewsDetailPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurpleAccent,
                 foregroundColor: Colors.white,
+
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               ),
             ),

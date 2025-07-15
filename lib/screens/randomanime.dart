@@ -3,7 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/anime.dart';
- import 'animewatchlist.dart';
+ import 'animedetails.dart';
+import 'animewatchlist.dart';
 
 class RandomAnimeDetailsPage extends StatefulWidget {
   const RandomAnimeDetailsPage({super.key});

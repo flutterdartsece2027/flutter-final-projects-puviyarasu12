@@ -7,7 +7,7 @@ class Anime {
   final String synopsis;
   final String type;
   final int episodes;
-  final String status;
+  late final String status;
   final int rank;
   final int popularity;
   final int members;
@@ -18,6 +18,7 @@ class Anime {
   final String? duration;
   final String? rating;
   final String? trailerUrl;
+  String? userStatus; // maps to Firestore field "userwatchliststatus"
   final String? backgroundImage;
   final String? airedFrom;
   final String? airedTo;
@@ -40,12 +41,13 @@ class Anime {
     this.duration,
     this.rating,
     this.trailerUrl,
+    this.userStatus,
     this.backgroundImage,
     this.airedFrom,
     this.airedTo,
   });
 
-  factory Anime.fromJson(Map<String, dynamic> json) {
+  factory Anime.fromJson(Map<String, dynamic> json, {String? userwatchliststatus}) {
     final aired = json['aired'];
     final trailer = json['trailer'];
 
@@ -74,6 +76,7 @@ class Anime {
       backgroundImage: json['images']?['jpg']?['large_image_url'],
       airedFrom: aired?['from'],
       airedTo: aired?['to'],
+      userStatus: userwatchliststatus,
     );
   }
 }
