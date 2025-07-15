@@ -1,14 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:animeinfo/screens/forgotpassword.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-//import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'nointernet.dart';
-
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -48,10 +44,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         MaterialPageRoute(builder: (_) => const NoInternetPage()),
       );
     } else {
+      // Delay to show the splash screen fully
       await Future.delayed(const Duration(seconds: 1));
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-      );
+
+      // Check if user is already logged in
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user != null) {
+        // User is already signed in
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomePage()),
+        );
+      } else {
+        // No user signed in, go to login
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
+      }
     }
   }
 
