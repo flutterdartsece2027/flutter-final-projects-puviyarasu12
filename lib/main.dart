@@ -17,8 +17,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConnectionWrapper(
-      child:MaterialApp(
+    return MaterialApp(
       title: 'AniVerse',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.deepPurpleAccent,
@@ -32,8 +31,8 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
+      builder: (context, child) => ConnectionWrapper(child: child!),
       home: const SplashScreen(),
-    )
     );
   }
 }

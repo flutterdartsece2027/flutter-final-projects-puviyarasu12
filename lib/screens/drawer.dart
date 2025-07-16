@@ -1,5 +1,6 @@
 
 import 'dart:io';
+import 'package:animeinfo/screens/nointernet.dart';
 import 'package:flutter/material.dart';
 import 'animenews.dart';
 import 'categoriesresult.dart';
@@ -111,7 +112,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   leading: const Icon(Icons.newspaper, color: Colors.deepPurpleAccent),
                   title: const Text('Anime News', style: TextStyle(color: Colors.white)),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AnimeNewsPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ConnectionWrapper(child: const AnimeNewsPage())));
                   },
                 ),
               ),
@@ -127,7 +128,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   leading: const Icon(Icons.shuffle, color: Colors.deepPurpleAccent),
                   title: const Text('Random Anime', style: TextStyle(color: Colors.white)),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const RandomAnimeDetailsPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => ConnectionWrapper(child:const RandomAnimeDetailsPage())));
                   },
                 ),
               ),
@@ -228,7 +229,7 @@ class CategoriesPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CategoryResultsPage(genre: genre),
+                    builder: (_) => ConnectionWrapper(child:CategoryResultsPage(genre: genre)),
                   ),
                 );
               },

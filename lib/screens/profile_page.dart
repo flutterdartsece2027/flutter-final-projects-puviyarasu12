@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:animeinfo/screens/settings.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -97,14 +98,22 @@ class _ProfilePageState extends State<ProfilePage> {
             ListTile(
               leading: const Icon(Icons.settings, color: Colors.deepPurpleAccent),
               title: const Text("Settings", style: TextStyle(color: Colors.white)),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+              onTap: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                );
+                // 🔁 Refresh profile data once SettingsPage is popped
+                _loadProfileData();
               },
             ),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.deepPurpleAccent),
               title: const Text("Logout", style: TextStyle(color: Colors.white)),
-              onTap: () {
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.clear();
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => const LoginPage()),

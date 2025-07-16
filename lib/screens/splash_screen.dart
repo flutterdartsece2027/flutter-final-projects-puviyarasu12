@@ -30,7 +30,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
-    Timer(const Duration(seconds: 8), _checkConnectivityAndNavigate);
+    Future.delayed(const Duration(seconds: 8), () {
+      _checkConnectivityAndNavigate();
+    });
   }
 
   Future<void> _checkConnectivityAndNavigate() async {
