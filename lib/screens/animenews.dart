@@ -20,8 +20,12 @@ class AnimeNewsPage extends StatelessWidget {
         future: ApiNews.fetchAnimeNews(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
+            return ListView.builder(
+              itemCount: 5,
+              itemBuilder: (context, index) => const SkeletonNewsCard(),
+            );
+          }
+          else if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}', style: const TextStyle(color: Colors.redAccent)),
             );
@@ -174,6 +178,39 @@ class NewsDetailPage extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+class SkeletonNewsCard extends StatelessWidget {
+  const SkeletonNewsCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Colors.grey[900],
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      elevation: 4,
+      child: ListTile(
+        leading: Container(
+          width: 80,
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.grey[800],
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        title: Container(
+          height: 16,
+          width: double.infinity,
+          color: Colors.grey[700],
+          margin: const EdgeInsets.only(bottom: 8),
+        ),
+        subtitle: Container(
+          height: 14,
+          width: 100,
+          color: Colors.grey[600],
         ),
       ),
     );
