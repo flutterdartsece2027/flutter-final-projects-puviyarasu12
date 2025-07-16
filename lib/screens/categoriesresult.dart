@@ -75,7 +75,7 @@ class CategoryResultsPage extends StatelessWidget {
         future: fetchByGenre(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: FadingTextLoader());
           }
 
           if (snapshot.hasError) {
@@ -149,6 +149,46 @@ class CategoryResultsPage extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+}
+class FadingTextLoader extends StatefulWidget {
+  const FadingTextLoader({super.key});
+
+  @override
+  State<FadingTextLoader> createState() => _FadingTextLoaderState();
+}
+
+class _FadingTextLoaderState extends State<FadingTextLoader>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fade;
+
+  @override
+  void initState() {
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+
+    _fade = Tween<double>(begin: 0.3, end: 1.0).animate(_controller);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: const Text(
+        "Loading anime...",
+        style: TextStyle(color: Colors.purpleAccent, fontSize: 18),
       ),
     );
   }
