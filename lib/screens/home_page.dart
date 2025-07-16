@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:flutter/cupertino.dart';
+import 'package:lottie/lottie.dart';
 import 'package:flutter/material.dart';
 import '../models/anime.dart';
 import '../api_service.dart';
@@ -99,7 +100,29 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset(
+              'assets/images/Gibli Tribute.json',
+              width: 180,
+              height: 180,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 16),
+             const CupertinoActivityIndicator(radius: 15),
+            const Text(
+              "Loading...",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      )
           : SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
