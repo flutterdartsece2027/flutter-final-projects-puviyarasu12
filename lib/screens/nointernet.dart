@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'package:animeinfo/screens/splash_screen.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'dart:io';
-
+import 'package:animeinfo/screens/splash_screen.dart';
 
 class ConnectionWrapper extends StatefulWidget {
   final Widget child;
@@ -16,45 +15,45 @@ class ConnectionWrapper extends StatefulWidget {
 
 class _ConnectionWrapperState extends State<ConnectionWrapper> {
   late StreamSubscription<List<ConnectivityResult>> _subscription;
+  bool _isOfflinePageShown = false;
 
   @override
   void initState() {
     super.initState();
+
     _subscription = Connectivity().onConnectivityChanged.listen((results) async {
       if (results.isEmpty || results.first == ConnectivityResult.none) {
-        _navigateToNoInternet();
+        _showOfflinePage();
       } else {
-        bool active = await hasInternetConnection();
-        if (!active) _navigateToNoInternet();
+        final connected = await hasInternetConnection();
+        if (!connected) {
+          _showOfflinePage();
+        } else {
+          _isOfflinePageShown = false;
+        }
       }
     });
   }
 
-  Future<bool> hasInternetConnection() async {
-    try {
-      final result = await InternetAddress.lookup('example.com');
-      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException {
-      return false;
-    }
+  void _showOfflinePage() {
+    if (_isOfflinePageShown) return;
+    _isOfflinePageShown = true;
+
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => const NoInternetPage(),
+    ));
   }
 
-  void _navigateToNoInternet() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const NoInternetPage()),
-    );
-  }
+  @override
+  Widget build(BuildContext context) => widget.child;
 
   @override
   void dispose() {
     _subscription.cancel();
     super.dispose();
   }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }
+
 Future<bool> hasInternetConnection() async {
   try {
     final result = await InternetAddress.lookup('example.com');
@@ -72,27 +71,30 @@ class NoInternetPage extends StatefulWidget {
 }
 
 class _NoInternetPageState extends State<NoInternetPage> {
-  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  late StreamSubscription<List<ConnectivityResult>> _subscription;
   bool _isChecking = false;
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ Listen to connectivity changes (v5+ returns List<ConnectivityResult>)
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(
-          (List<ConnectivityResult> results) {
-        if (results.isNotEmpty && results.first != ConnectivityResult.none) {
-          _handleConnectivityChange();
+    _subscription = Connectivity().onConnectivityChanged.listen((results) async {
+      if (results.isNotEmpty && results.first != ConnectivityResult.none) {
+        final hasInternet = await hasInternetConnection();
+        if (hasInternet) {
+          _goBackToApp();
         }
-      },
-    );
+      }
+    });
   }
 
-  Future<void> _handleConnectivityChange() async {
-    bool hasInternet = await hasInternetConnection();
-    if (hasInternet) {
-      _navigateToLogin();
+  void _goBackToApp() {
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(); // go back to previous screen
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+      );
     }
   }
 
@@ -101,14 +103,13 @@ class _NoInternetPageState extends State<NoInternetPage> {
 
     setState(() => _isChecking = true);
 
-    bool hasInternet = await hasInternetConnection();
-
+    final hasInternet = await hasInternetConnection();
     if (hasInternet) {
-      _navigateToLogin();
+      _goBackToApp();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Still offline. Check your connection'),
+          content: Text('Still offline. Check your connection.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -116,15 +117,9 @@ class _NoInternetPageState extends State<NoInternetPage> {
     }
   }
 
-  void _navigateToLogin() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const LoginPage()),
-    );
-  }
-
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    _subscription.cancel();
     super.dispose();
   }
 
