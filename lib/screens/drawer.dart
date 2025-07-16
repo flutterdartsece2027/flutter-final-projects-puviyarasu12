@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'animenews.dart';
 import 'categoriesresult.dart';
+import 'dart:convert';
 import 'randomanime.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,12 +25,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
     super.initState();
     _loadUserData();
   }
-
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
+    final base64Image = prefs.getString('profile_image');
+
+    File? imageFile;
+    if (base64Image != null) {
+      final bytes = base64Decode(base64Image);
+      final tempDir = Directory.systemTemp;
+      imageFile = await File('${tempDir.path}/drawer_profile_image.png').writeAsBytes(bytes);
+    }
+
     setState(() {
       _username = prefs.getString('username') ?? "Otaku";
-      _profileImagePath = prefs.getString('profile_image');
+      _profileImagePath = imageFile?.path;
     });
   }
 

@@ -68,7 +68,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
               final prefs = await SharedPreferences.getInstance();
               await prefs.setString('username', newName);
-
               setState(() => _username = newName); // UI instantly reflects
               Navigator.pop(context);
               _showMessage("Username updated");
